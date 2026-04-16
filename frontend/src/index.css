@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* Hide scrollbar (works in all browsers) */
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE & Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
