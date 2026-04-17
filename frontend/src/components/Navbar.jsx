@@ -1,8 +1,8 @@
 // src/components/Navbar.jsx
-import { Link } from "react-router-dom";
 
 import { Search, Bell, Menu, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Navbar() {
 
@@ -37,23 +37,23 @@ function Navbar() {
         {/* DESKTOP MENU */}
         <div className="hidden lg:flex items-center gap-6">
 
-            {[
-            { name: "Browse", path: "/" },
-            { name: "List Item", path: "/list-item" },
-            { name: "Swaps", path: "/swaps" },
-            { name: "Messages", path: "/messages" },
-            { name: "Profile", path: "/profile" },
-            { name: "Admin", path: "/admin" },
-            ].map((item) => (
-            <Link
-                key={item.name}
-                to={item.path}
-                className="relative group text-sm font-medium"
-            >
-                {item.name}
-                <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-green-600 transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            ))}
+          {[
+  { name: "Browse", path: "/" },
+  { name: "List Item", path: "/list-item" },
+  { name: "Swaps", path: "/swaps" },
+  { name: "Messages", path: "/messages" },
+  { name: "Profile", path: "/profile" },
+  { name: "Admin", path: "/admin" },
+].map((item) => (
+  <Link
+    key={item.name}
+    to={item.path}
+    className="relative group text-sm font-medium"
+  >
+    {item.name}
+    <span className="absolute left-0 bottom-0 h-[2px] w-0 bg-green-600 transition-all duration-300 group-hover:w-full"></span>
+  </Link>
+))}
 
           <Bell size={20} className="cursor-pointer" />
         </div>
@@ -62,15 +62,14 @@ function Navbar() {
         <div className="flex items-center gap-3 lg:hidden">
 
          <div className="relative cursor-pointer">
-        <Bell size={20} />
+    <Bell size={20} />
 
-        {notifications > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full">
-            {notifications}
-            </span>
-        )}
-        </div>
-        
+    {notifications > 0 && (
+        <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] min-w-[16px] h-4 px-1 flex items-center justify-center rounded-full">
+        {notifications}
+        </span>
+    )}
+    </div>
 
           <button onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X size={24} /> : <Menu size={24} />}
