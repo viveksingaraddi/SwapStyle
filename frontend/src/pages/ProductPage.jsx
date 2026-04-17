@@ -1,4 +1,5 @@
 import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
 import products from "../data/products";
 import { MapPin, Heart, Share2 } from "lucide-react";
 import ItemCard from "../components/ItemCard";
@@ -6,10 +7,21 @@ import ItemCard from "../components/ItemCard";
 function ProductPage() {
   const { id } = useParams();
 
-  const product = products.find((item) => item.id === parseInt(id));
-  const similarProducts = products.filter(
-    (item) => item.category === product?.category && item.id !== product?.id
-  );
+  const product = allProducts.find(
+  (item) => item.id === parseInt(id)
+);
+  const similarProducts = allProducts.filter(
+  (item) =>
+    item.category === product?.category &&
+    item.id !== product?.id
+);
+
+  const [allProducts, setAllProducts] = useState([]);
+
+  useEffect(() => {
+  const stored = JSON.parse(localStorage.getItem("products")) || [];
+  setAllProducts([...stored, ...products]);
+}, []);
 
   if (!product) {
     return <h1 className="p-10 text-center text-xl">Product not found</h1>;
