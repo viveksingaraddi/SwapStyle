@@ -51,30 +51,6 @@ SwapStyle is a modern web application that allows users to list, browse, and swa
 
 ---
 
-## 📁 Project Structure
-
-frontend/
-│
-├── src/
-│ ├── assets/ # Images
-│ ├── components/ # Reusable UI components
-│ │ ├── Navbar.jsx
-│ │ ├── ItemCard.jsx
-│ │ ├── Footer.jsx
-│ │
-│ ├── data/
-│ │ └── products.jsx # Static products
-│ │
-│ ├── pages/
-│ │ ├── Home.jsx
-│ │ ├── AddListing.jsx
-│ │ ├── ProductPage.jsx
-│ │
-│ ├── App.jsx
-│ └── main.jsx
-
----
-
 ## ⚙️ Installation & Setup
 
 ### 1. Clone the repo
@@ -86,12 +62,18 @@ cd swapstyle
 
 ### 2. Install dependencies
 
+```bash
 npm install
+```
 
 ### 3. Run the app
 
+```bash
 npm run dev
+```
 
+```bash
 ### 4. Open in browser
 
 http://localhost:5173
+```
