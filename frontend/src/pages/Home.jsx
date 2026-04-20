@@ -135,7 +135,7 @@ function Home() {
         
             </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {recommendedProducts.map((item) => (
                 <ItemCard key={item.id} product={item} />
                 ))}

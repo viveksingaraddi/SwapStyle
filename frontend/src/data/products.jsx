@@ -43,16 +43,113 @@ const products = [
   },
   {
     id: 4,
-    name: "Shoes",
-    brand: "Nike",
+    name: "Skirt",
+    brand: "Renovate",
     size: "9",
     price: 70,
     location: "LA",
     condition: "New",
     image: img4,
     recommended: true,
+    category: "skirts"
+  },
+  {
+    id: 5,
+    name: "Denim Jacket",
+    brand: "Levi's",
+    size: "M",
+    price: 50,
+    location: "New York, NY",
+    condition: "Good",
+    image: img1,
+    recommended: true,
+    category: "jackets"
+  },
+  {
+    id: 6,
+    name: "Sweater",
+    brand: "H&M",
+    size: "L",
+    price: 30,
+    location: "Chicago",
+    condition: "Excellent",
+    image: img2,
+    recommended: false,
+    category: "sweaters"
+  },
+  {
+    id: 7,
+    name: "Shoes",
+    brand: "Nike",
+    size: "9",
+    price: 70,
+    location: "LA",
+    condition: "New",
+    image: img3,
+    recommended: true,
     category: "shoes"
+  },
+  {
+    id: 8,
+    name: "Skirts",
+    brand: "Renovate",
+    size: "9",
+    price: 70,
+    location: "LA",
+    condition: "New",
+    image: img4,
+    recommended: true,
+    category: "skirts"
+  },
+  {
+    id: 9,
+    name: "Denim Jacket",
+    brand: "Levi's",
+    size: "M",
+    price: 50,
+    location: "New York, NY",
+    condition: "Good",
+    image: img1,
+    recommended: true,
+    category: "jackets"
+  },
+  {
+    id: 10,
+    name: "Sweater",
+    brand: "H&M",
+    size: "L",
+    price: 30,
+    location: "Chicago",
+    condition: "Excellent",
+    image: img2,
+    recommended: false,
+    category: "sweaters"
+  },
+  {
+    id: 11,
+    name: "Shoes",
+    brand: "Nike",
+    size: "9",
+    price: 70,
+    location: "LA",
+    condition: "New",
+    image: img3,
+    recommended: true,
+    category: "shoes"
+  },
+  {
+    id: 12,
+    name: "Skirts",
+    brand: "Renovate",
+    size: "9",
+    price: 70,
+    location: "LA",
+    condition: "New",
+    image: img4,
+    recommended: true,
+    category: "skirts"
   }
+  
 ];
 
 export default products;

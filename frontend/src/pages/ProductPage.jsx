@@ -5,27 +5,45 @@ import { MapPin, Heart, Share2 } from "lucide-react";
 import ItemCard from "../components/ItemCard";
 
 function ProductPage() {
-  const { id } = useParams();
+const { id } = useParams();
+const [allProducts, setAllProducts] = useState([]);
+const [selectedImage, setSelectedImage] = useState(null);
 
-  const product = allProducts.find(
-  (item) => item.id === parseInt(id)
-);
-  const similarProducts = allProducts.filter(
-  (item) =>
-    item.category === product?.category &&
-    item.id !== product?.id
-);
-
-  const [allProducts, setAllProducts] = useState([]);
-
-  useEffect(() => {
+useEffect(() => {
   const stored = JSON.parse(localStorage.getItem("products")) || [];
   setAllProducts([...stored, ...products]);
 }, []);
 
+const product = allProducts.find(
+  (item) => item.id === parseInt(id)
+);
+
+useEffect(() => {
+  if (product) {
+    if (product.images && product.images.length > 0) {
+      setSelectedImage(product.images[0]);
+    } else {
+      setSelectedImage(product.image);
+    }
+  }
+}, [product]);
+
+
+const similarProducts = allProducts.filter(
+  (item) =>
+    item.category === product?.category &&
+    item.id !== product?.id
+).slice(0, 4); // limit to 4 (clean UI)
+
   if (!product) {
     return <h1 className="p-10 text-center text-xl">Product not found</h1>;
   }
+
+  if (allProducts.length === 0) {
+  return <div className="p-10 text-center">Loading...</div>;
+}
+
+
 
   return (
     <div className="pt-24 px-4 md:px-10 lg:px-20">
@@ -38,11 +56,36 @@ function ProductPage() {
 
           {/* MAIN IMAGE */}
           <div className="bg-gray-100 rounded-xl p-4 flex justify-center sticky top-24">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full max-h-[500px] object-contain rounded-lg"
-            />
+            <div className="flex flex-col gap-4">
+
+  {/* MAIN IMAGE */}
+  <div className="bg-gray-100 rounded-xl p-4 flex justify-center sticky top-24">
+    <img
+      src={selectedImage || product.image}
+      className="w-full max-h-[500px] object-contain rounded-lg transition"
+    />
+  </div>
+
+  {/* THUMBNAILS */}
+  <div className="flex gap-3">
+    {(product.images?.length > 0
+      ? product.images
+      : [product.image]
+    ).map((img, i) => (
+      <img
+        key={i}
+        src={img}
+        onClick={() => setSelectedImage(img)}
+        className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition
+          ${
+            selectedImage === img
+              ? "border-green-500 ring-2 ring-green-400"
+              : "hover:scale-105"
+          }`}
+      />
+    ))}
+  </div>
+</div>
           </div>
 
           {/* THUMBNAILS */}
@@ -131,14 +174,24 @@ function ProductPage() {
 
       {/* SIMILAR PRODUCTS */}
       <div className="mt-16">
-        <h2 className="text-xl font-semibold mb-6">Similar Products</h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {similarProducts.map((item) => (
-            <ItemCard key={item.id} product={item} />
-          ))}
-        </div>
-      </div>
+  <h2 className="text-2xl font-bold mb-6">
+    More like this
+  </h2>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {similarProducts.length > 0 ? (
+      similarProducts.map((item) => (
+        <ItemCard key={item.id} product={item} />
+      ))
+    ) : (
+      <p className="text-gray-500">
+        No similar items found
+      </p>
+    )}
+  </div>
+
+</div>
 
     </div>
   );

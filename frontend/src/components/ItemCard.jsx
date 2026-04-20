@@ -12,7 +12,7 @@ function ItemCard({ product }) {
         {/* IMAGE */}
         <img
           src={product.image}
-          className="w-full h-60 object-cover"
+          className="w-full h-80 object-cover hover:scale-105 transition"
         />
 
         {/* CONDITION TAG */}
