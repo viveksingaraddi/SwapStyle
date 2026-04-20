@@ -1,16 +1,97 @@
-# React + Vite
+# 🛍️ SwapStyle – Sustainable Clothing Swap Platform
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+SwapStyle is a modern web application that allows users to list, browse, and swap clothing items locally — promoting sustainable fashion and reducing waste.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🚀 Features
 
-## React Compiler
+### 🧾 Core Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Browse clothing listings by category
+- Add new listings with images
+- View detailed product pages
+- Category-based filtering
+- Recommended products section
+- Similar products (internal linking)
 
-## Expanding the ESLint configuration
+### 📸 Listing Features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Image upload (local preview)
+- Form validation
+- Category & size selection
+- Condition tagging (New / Good / Excellent)
+
+### 🔄 Swap System (UI Ready)
+
+- Swap request UI (Pending / Accepted / Rejected)
+- Clean OLX / Flipkart style design
+
+### 💾 Data Handling
+
+- Static products (from local data)
+- Dynamic products (stored in localStorage)
+- Merged product system (static + user-added)
+
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+- ⚛️ React (Vite)
+- 🎨 Tailwind CSS
+- 🔀 React Router DOM
+- 🎯 Lucide Icons
+
+### State & Storage
+
+- React Hooks (useState, useEffect)
+- Browser localStorage (temporary DB)
+
+---
+
+## 📁 Project Structure
+
+frontend/
+│
+├── src/
+│ ├── assets/ # Images
+│ ├── components/ # Reusable UI components
+│ │ ├── Navbar.jsx
+│ │ ├── ItemCard.jsx
+│ │ ├── Footer.jsx
+│ │
+│ ├── data/
+│ │ └── products.jsx # Static products
+│ │
+│ ├── pages/
+│ │ ├── Home.jsx
+│ │ ├── AddListing.jsx
+│ │ ├── ProductPage.jsx
+│ │
+│ ├── App.jsx
+│ └── main.jsx
+
+---
+
+## ⚙️ Installation & Setup
+
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/your-username/swapstyle.git
+cd swapstyle
+```
+
+### 2. Install dependencies
+
+npm install
+
+### 3. Run the app
+
+npm run dev
+
+### 4. Open in browser
+
+http://localhost:5173
