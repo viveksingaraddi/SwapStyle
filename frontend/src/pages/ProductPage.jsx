@@ -1,198 +1,97 @@
+// src/pages/ProductPage.jsx
+
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import products from "../data/products";
-import { MapPin, Heart, Share2 } from "lucide-react";
-import ItemCard from "../components/ItemCard";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 
 function ProductPage() {
-const { id } = useParams();
-const [allProducts, setAllProducts] = useState([]);
-const [selectedImage, setSelectedImage] = useState(null);
+  const { id } = useParams(); // ✅ get ID from URL
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const stored = JSON.parse(localStorage.getItem("products")) || [];
-  setAllProducts([...stored, ...products]);
-}, []);
+  useEffect(() => {
+    console.log("Fetching product ID:", id);
 
-const product = allProducts.find(
-  (item) => item.id === parseInt(id)
-);
+    fetch(`http://localhost:8000/api/products/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        console.log("PRODUCT DATA:", data);
+        setProduct(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.log("ERROR:", err);
+        setLoading(false);
+      });
+  }, [id]);
 
-useEffect(() => {
-  if (product) {
-    if (product.images && product.images.length > 0) {
-      setSelectedImage(product.images[0]);
-    } else {
-      setSelectedImage(product.image);
-    }
-  }
-}, [product]);
-
-
-const similarProducts = allProducts.filter(
-  (item) =>
-    item.category === product?.category &&
-    item.id !== product?.id
-).slice(0, 4); // limit to 4 (clean UI)
-
-  if (!product) {
-    return <h1 className="p-10 text-center text-xl">Product not found</h1>;
+  if (loading) {
+    return <div className="p-10 text-center">Loading...</div>;
   }
 
-  if (allProducts.length === 0) {
-  return <div className="p-10 text-center">Loading...</div>;
-}
-
-
+  if (!product || product.error) {
+    return (
+      <div className="p-20 text-center text-red-500 text-xl">
+        Product not found
+      </div>
+    );
+  }
 
   return (
-    <div className="pt-24 px-4 md:px-10 lg:px-20">
+    <div>
+      <Navbar />
 
-      {/* MAIN SECTION */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+      {/* ✅ FIX: ADD TOP PADDING (navbar overlap fix) */}
+      <div className="pt-24 px-6 max-w-6xl mx-auto">
 
-        {/* LEFT → IMAGE GALLERY */}
-        <div className="flex flex-col gap-4">
+        <div className="grid md:grid-cols-2 gap-10">
 
-          {/* MAIN IMAGE */}
-          <div className="bg-gray-100 rounded-xl p-4 flex justify-center sticky top-24">
-            <div className="flex flex-col gap-4">
+          {/* IMAGE */}
+          <img
+            src={product.images?.[0]}
+            alt={product.name}
+            className="w-full h-[500px] object-cover rounded-lg"
+          />
 
-  {/* MAIN IMAGE */}
-  <div className="bg-gray-100 rounded-xl p-4 flex justify-center sticky top-24">
-    <img
-      src={selectedImage || product.image}
-      className="w-full max-h-[500px] object-contain rounded-lg transition"
-    />
-  </div>
+          {/* DETAILS */}
+          <div>
 
-  {/* THUMBNAILS */}
-  <div className="flex gap-3">
-    {(product.images?.length > 0
-      ? product.images
-      : [product.image]
-    ).map((img, i) => (
-      <img
-        key={i}
-        src={img}
-        onClick={() => setSelectedImage(img)}
-        className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition
-          ${
-            selectedImage === img
-              ? "border-green-500 ring-2 ring-green-400"
-              : "hover:scale-105"
-          }`}
-      />
-    ))}
-  </div>
-</div>
-          </div>
+            <h1 className="text-3xl font-bold mb-2">
+              {product.name}
+            </h1>
 
-          {/* THUMBNAILS */}
-          <div className="flex gap-3">
-            {[product.image, product.image, product.image].map((img, i) => (
-              <img
-                key={i}
-                src={img}
-                className="w-20 h-20 object-cover rounded-lg border cursor-pointer hover:scale-105 transition"
-              />
-            ))}
-          </div>
-        </div>
+            <p className="text-gray-600 mb-2">
+              {product.brand} • Size: {product.size}
+            </p>
 
-        {/* RIGHT → DETAILS */}
-        <div className="flex flex-col gap-5">
-
-          {/* TITLE */}
-          <h1 className="text-2xl md:text-3xl font-bold">
-            {product.name}
-          </h1>
-
-          {/* BRAND */}
-          <p className="text-gray-500">
-            {product.brand} • Size: {product.size}
-          </p>
-
-          {/* PRICE */}
-          <div className="flex items-center gap-4">
-            <span className="text-3xl text-green-600 font-bold">
+            <p className="text-green-600 text-2xl font-semibold mb-4">
               ${product.price}
-            </span>
-            <span className="text-sm bg-green-100 text-green-700 px-2 py-1 rounded">
-              Best Deal
-            </span>
-          </div>
+            </p>
 
-          {/* LOCATION */}
-          <div className="flex items-center gap-2 text-gray-600">
-            <MapPin size={18} />
-            {product.location}
-          </div>
+            <p className="mb-4">
+              {product.description || "No description"}
+            </p>
 
-          {/* CONDITION */}
-          <span className="w-fit px-3 py-1 bg-green-200 text-green-800 rounded-full text-sm">
-            {product.condition}
-          </span>
+            <p className="mb-2">
+              📍 {product.location}
+            </p>
 
-          {/* ACTION BUTTONS */}
-          <div className="flex gap-3 mt-4 flex-wrap">
-            <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition">
+            <p className="mb-4">
+              Condition: {product.condition}
+            </p>
+
+            <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500">
               Request Swap
             </button>
 
-            <button className="border px-4 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-100">
-              <Heart size={18} /> Wishlist
-            </button>
-
-            <button className="border px-4 py-3 rounded-lg flex items-center gap-2 hover:bg-gray-100">
-              <Share2 size={18} /> Share
-            </button>
-          </div>
-
-          {/* SELLER INFO */}
-          <div className="mt-6 border rounded-lg p-4 bg-gray-50">
-            <h3 className="font-semibold mb-2">Seller Info</h3>
-            <p className="text-sm text-gray-600">
-              Verified User ✔️ <br />
-              Member since 2024 <br />
-              25 Successful Swaps
-            </p>
           </div>
 
         </div>
+
       </div>
 
-      {/* DESCRIPTION */}
-      <div className="mt-12">
-        <h2 className="text-xl font-semibold mb-3">Description</h2>
-        <p className="text-gray-600 leading-relaxed">
-          This item is in great condition and ready for swapping. Help reduce
-          waste and promote sustainable fashion by exchanging items you no
-          longer use.
-        </p>
-      </div>
-
-      {/* SIMILAR PRODUCTS */}
-      <div className="mt-16">
-
-  <h2 className="text-2xl font-bold mb-6">
-    More like this
-  </h2>
-
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {similarProducts.length > 0 ? (
-      similarProducts.map((item) => (
-        <ItemCard key={item.id} product={item} />
-      ))
-    ) : (
-      <p className="text-gray-500">
-        No similar items found
-      </p>
-    )}
-  </div>
-
-</div>
-
+      <Footer />
     </div>
   );
 }

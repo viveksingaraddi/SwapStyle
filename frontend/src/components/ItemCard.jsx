@@ -1,24 +1,28 @@
 // src/components/ItemCard.jsx
-import sampleimg from "../assets/sample_item_1.jpg";
+
 import { MapPin, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 
 function ItemCard({ product }) {
+
+  console.log("CARD PRODUCT:", product); // DEBUG
+
   return (
-    <Link to={`/product/${product.id}`} className="group block animate-fade-in">
+    <Link to={`/product/${product._id}`} className="group block animate-fade-in">
       
       <div className="relative rounded-lg shadow hover:shadow-lg transition overflow-hidden bg-white">
 
-        {/* IMAGE */}
+        {/* ✅ FIXED IMAGE */}
         <img
-          src={product.image}
+          src={product.images?.[0] || "https://via.placeholder.com/300"}
+          alt={product.name}
           className="w-full h-80 object-cover hover:scale-105 transition"
         />
 
         {/* CONDITION TAG */}
         <div className="absolute top-2 left-2">
           <span className="px-3 py-1 text-sm bg-[hsl(152_35%_45%)] text-black rounded-full">
-            {product.condition}
+            {product.condition || "New"}
           </span>
         </div>
 

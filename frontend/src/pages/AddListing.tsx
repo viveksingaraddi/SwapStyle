@@ -64,24 +64,28 @@ function AddListing() {
   };
 
   // SUBMIT
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    if (!validate()) return;
+  if (!validate()) return;
 
-    const newProduct = {
-      id: Date.now(),
-      ...formData,
-      image: formData.images[0] || "",
-      recommended: false
-    };
+  const newProduct = {
+    ...formData,
+    price: Number(formData.price), // ensure number
+  };
 
-    const existing = JSON.parse(localStorage.getItem("products")) || [];
+  try {
+    const res = await fetch("http://localhost:8000/api/products", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(newProduct),
+    });
 
-    localStorage.setItem(
-      "products",
-      JSON.stringify([newProduct, ...existing])
-    );
+    const data = await res.json();
+
+    console.log("✅ Saved:", data);
 
     alert("🚀 Item Listed Successfully!");
 
@@ -97,7 +101,12 @@ function AddListing() {
       description: "",
       images: []
     });
-  };
+
+  } catch (err) {
+    console.error("❌ Error:", err);
+    alert("Failed to save product");
+  }
+};
 
   return (
     <div className="pt-24 px-4 md:px-10 bg-gray-50 min-h-screen">
@@ -148,7 +157,7 @@ function AddListing() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-gray-400 text-xl">🖼️</span>
+          <span className="text-gray-400 text-4xl">🖼️</span>
         )}
       </div>
     ))}
@@ -329,12 +338,11 @@ function AddListing() {
         <div className="bg-white p-4 rounded-2xl shadow-sm h-fit sticky top-24">
           <h3 className="font-semibold mb-3">Preview</h3>
 
-          <div className="border rounded-xl overflow-hidden">
+          <div className="border border-gray-300 rounded-xl overflow-hidden">
             <img
               src={
-                formData.images[0] ||
-                "https://via.placeholder.com/300x200"
-              }
+  formData.images?.[0] || placeholder
+}              alt="Preview"
               className="w-full h-40 object-cover"
             />
 

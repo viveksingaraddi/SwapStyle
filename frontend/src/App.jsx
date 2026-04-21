@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import AddListing from "./pages/AddListing";
+import Swaps from "./pages/Swaps";
 
 function App() {
   return (
@@ -10,6 +11,7 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/list-item" element={<AddListing />} />
+        <Route path="/swaps" element={<Swaps />} />
       </Routes>
     </BrowserRouter>
   );

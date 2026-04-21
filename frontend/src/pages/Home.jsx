@@ -2,7 +2,6 @@
 
 import Navbar from "../components/Navbar";
 import ItemCard from "../components/ItemCard";
-import products from "../data/products";
 import Button from "../components/Button";
 import heroImage from "../assets/hero-clothing.jpeg";
 import { Leaf, ShieldCheck, ArrowLeftRight } from "lucide-react";
@@ -16,10 +15,16 @@ function Home() {
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [allProducts, setAllProducts] = useState([]);
 
-    useEffect(() => {
-        const stored = JSON.parse(localStorage.getItem("products")) || [];
-        setAllProducts([...stored, ...products]);
-    }, []);
+  
+
+  useEffect(() => {
+  fetch("http://localhost:8000/api/products")
+    .then((res) => res.json())
+    .then((data) => {
+      console.log("PRODUCTS:", data); // 👈 ADD THIS
+      setAllProducts(data);
+    });
+}, []);
 
     const recommendedProducts = allProducts.filter(
         (item) => item?.recommended
@@ -80,17 +85,17 @@ function Home() {
 </div>
       
       <section className="border-b border-gray-200 bg-card">
-            <div class="relative bg-cover bg-white mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
+            <div  className="relative bg-cover bg-white mx-auto px-4 py-6 flex flex-wrap items-center justify-center gap-8 text-sm text-muted-foreground">
             
-                <div class="flex items-center gap-2">
+                <div  className="flex items-center gap-2">
                     <Leaf size={20} className="text-green-600" />
                     <span >Sustainable Fashion</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div  className="flex items-center gap-2">
                     <ShieldCheck size={20} className="text-green-600" />
                     <span >Verified Users</span>
                 </div>
-                <div class="flex items-center gap-2">
+                <div  className="flex items-center gap-2">
                     <ArrowLeftRight size={20} className="text-green-600" />
                     <span >10,000+ Successful Swaps</span>
                 </div>
@@ -124,7 +129,7 @@ function Home() {
         
         <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredProducts.map((item) => (
-  <ItemCard key={item.id} product={item} />
+  <ItemCard key={item._id} product={item} />
 ))}
         </div>
         <section className="bg-[hsl(40deg_25%_94%/50%)]">
@@ -137,7 +142,7 @@ function Home() {
 
             <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                 {recommendedProducts.map((item) => (
-                <ItemCard key={item.id} product={item} />
+                <ItemCard key={item._id} product={item} />
                 ))}
             </div>
         </section>
