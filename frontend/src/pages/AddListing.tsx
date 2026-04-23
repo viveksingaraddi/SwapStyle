@@ -1,5 +1,6 @@
 import { useState } from "react";
 import placeholder from "../assets/placeholder.jpg";
+import Navbar from "../components/Navbar";
 
 function AddListing() {
   const [formData, setFormData] = useState({
@@ -109,8 +110,11 @@ function AddListing() {
 };
 
   return (
-    <div className="pt-24 px-4 md:px-10 bg-gray-50 min-h-screen">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
+    <div>
+      <Navbar/>
+    <div className="py-30 px-4 sm:px-6 md:px-10 bg-gray-50 min-h-screen">
+      
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
 
         {/* LEFT SIDE FORM */}
         <form
@@ -133,8 +137,8 @@ function AddListing() {
     {/* MAIN UPLOAD BOX */}
     <label className="w-28 h-28 border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:border-green-500 transition">
 
-      <span className="text-2xl">⬆️</span>
-      <span className="text-xs text-gray-500 mt-1">Add Photo</span>
+      <span className="justify-center sm:block text-2xl arrowicon">⬆️</span>
+      <span className="text-center text-xs text-gray-500 mt-1">Add Photo</span>
 
       <input
         type="file"
@@ -362,6 +366,7 @@ function AddListing() {
         </div>
 
       </div>
+    </div>
     </div>
   );
 }

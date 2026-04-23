@@ -1,126 +1,123 @@
-import Navbar from "../components/Navbar";
-import { ArrowLeftRight, Check, X } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { ArrowRightLeft } from "lucide-react";
+import { useState } from "react";
 
 function Swaps() {
-
-    const [swaps, setSwaps] = useState([]);
-
-    useEffect(() => {
-  axios
-    .get("http://localhost:8000/api/swaps")
-    .then((res) => setSwaps(res.data))
-    .catch((err) => console.log(err));
-}, []);
-
-const updateStatus = (id, status) => {
-  axios
-    .put(`http://localhost:8000/api/swaps/${id}`, { status })
-    .then((res) => {
-      setSwaps((prev) =>
-        prev.map((s) => (s._id === id ? res.data : s))
-      );
-    });
-};
-  
+  const [swaps, setSwaps] = useState([
+    {
+      id: 1,
+      status: "pending",
+      offeredItem: {
+        name: "Denim Jacket",
+        image: "https://via.placeholder.com/150",
+        price: 45,
+      },
+      requestedItem: {
+        name: "Sweater",
+        image: "https://via.placeholder.com/150",
+        price: 35,
+      },
+    },
+    {
+      id: 2,
+      status: "accepted",
+      offeredItem: {
+        name: "Nike Shoes",
+        image: "https://via.placeholder.com/150",
+        price: 60,
+      },
+      requestedItem: {
+        name: "Zara Jacket",
+        image: "https://via.placeholder.com/150",
+        price: 50,
+      },
+    },
+    {
+      id: 3,
+      status: "rejected",
+      offeredItem: {
+        name: "Hoodie",
+        image: "https://via.placeholder.com/150",
+        price: 30,
+      },
+      requestedItem: {
+        name: "Jeans",
+        image: "https://via.placeholder.com/150",
+        price: 40,
+      },
+    },
+  ]);
 
   return (
-    <div>
-      <Navbar />
+    <div className="pt-20 px-4 sm:px-6 md:px-10 bg-gray-50 min-h-screen">
 
-      <div className="pt-24 px-4 md:px-10">
+      {/* TITLE */}
+      <h1 className="text-2xl md:text-3xl font-bold mb-6">
+        Swap Requests
+      </h1>
 
-        <h1 className="text-3xl font-bold mb-6">Swap Requests</h1>
+      {/* SWAP LIST */}
+      <div className="space-y-6">
+        {swaps.map((swap) => (
+          <div
+            key={swap.id}
+            className="bg-white border rounded-xl p-4 sm:p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4"
+          >
 
-        {/* SWAP CARDS */}
-        <div className="space-y-6">
-
-          {swaps.map((swap) => (
-            <div
-              key={swap._id}
-              className="border rounded-xl p-5 bg-white shadow-sm"
-            >
-
-              {/* STATUS + DATE */}
-              <div className="flex justify-between items-center mb-4">
-
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium
-                    ${
-                      swap.status === "pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : swap.status === "accepted"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-red-100 text-red-700"
-                    }
-                  `}
-                >
-                  {swap.status}
-                </span>
-
-                <span className="text-sm text-gray-500">
-                  {swap.date}
-                </span>
-
+            {/* LEFT ITEM */}
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <img
+                src={swap.offeredItem.image}
+                alt=""
+                className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg"
+              />
+              <div>
+                <h3 className="font-semibold">
+                  {swap.offeredItem.name}
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  ${swap.offeredItem.price}
+                </p>
               </div>
-
-              {/* ITEMS */}
-              <div className="flex items-center justify-between">
-
-                {/* OFFERED */}
-                <div className="flex items-center gap-3">
-                  <img
-                    src={swap.offered.image}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-medium">{swap.offered.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ${swap.offered.price}
-                    </p>
-                  </div>
-                </div>
-
-                {/* ARROW */}
-                <ArrowLeftRight className="text-gray-400" />
-
-                {/* REQUESTED */}
-                <div className="flex items-center gap-3">
-                  <img
-                    src={swap.requested.image}
-                    className="w-16 h-16 rounded-lg object-cover"
-                  />
-                  <div>
-                    <p className="font-medium">{swap.requested.name}</p>
-                    <p className="text-sm text-gray-500">
-                      ${swap.requested.price}
-                    </p>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* ACTION BUTTONS */}
-              {swap.status === "pending" && (
-                <div className="mt-4 flex gap-3">
-
-                  <button className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2">
-                    <Check size={16} /> Accept
-                  </button>
-
-                  <button className="border px-4 py-2 rounded-lg flex items-center gap-2">
-                    <X size={16} /> Decline
-                  </button>
-
-                </div>
-              )}
-
             </div>
-          ))}
 
-        </div>
+            {/* SWAP ICON */}
+            <div className="text-gray-500">
+              <ArrowRightLeft size={20} />
+            </div>
 
+            {/* RIGHT ITEM */}
+            <div className="flex items-center gap-4 w-full md:w-auto justify-end">
+              <div className="text-right">
+                <h3 className="font-semibold">
+                  {swap.requestedItem.name}
+                </h3>
+                <p className="text-gray-500 text-sm">
+                  ${swap.requestedItem.price}
+                </p>
+              </div>
+              <img
+                src={swap.requestedItem.image}
+                alt=""
+                className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-lg"
+              />
+            </div>
+
+            {/* STATUS */}
+            <div className="w-full md:w-auto text-center md:text-right">
+              <span
+                className={`px-3 py-1 text-sm rounded-full text-white ${
+                  swap.status === "accepted"
+                    ? "bg-green-500"
+                    : swap.status === "rejected"
+                    ? "bg-red-500"
+                    : "bg-yellow-500"
+                }`}
+              >
+                {swap.status}
+              </span>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
