@@ -1,5 +1,6 @@
 import { ArrowRightLeft } from "lucide-react";
 import { useState } from "react";
+import Navbar from "../components/Navbar";
 
 function Swaps() {
   const [swaps, setSwaps] = useState([
@@ -48,8 +49,10 @@ function Swaps() {
   ]);
 
   return (
-    <div className="pt-20 px-4 sm:px-6 md:px-10 bg-gray-50 min-h-screen">
-
+    <div>
+      <Navbar />
+    <div className="pt-25 px-4 sm:px-6 md:px-10 bg-gray-50 min-h-screen">
+      
       {/* TITLE */}
       <h1 className="text-2xl md:text-3xl font-bold mb-6">
         Swap Requests
@@ -119,6 +122,7 @@ function Swaps() {
           </div>
         ))}
       </div>
+    </div>
     </div>
   );
 }

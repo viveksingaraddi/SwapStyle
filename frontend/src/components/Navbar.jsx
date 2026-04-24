@@ -10,7 +10,7 @@ function Navbar() {
   const notifications = 3;
 
   return (
-    <nav className="fixed top-0 w-full bg-white/60 backdrop-blur-md shadow-sm z-50">
+    <nav className="absolute fixed top-0 w-full bg-white/60 backdrop-blur-md shadow-sm z-50">
 
       {/* MAIN NAVBAR */}
       <div className="flex items-center justify-between px-4  py-3">

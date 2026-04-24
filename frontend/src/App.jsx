@@ -3,6 +3,9 @@ import Home from "./pages/Home";
 import ProductPage from "./pages/ProductPage";
 import AddListing from "./pages/AddListing";
 import Swaps from "./pages/Swaps";
+import Messages from "./pages/Messages";
+
+
 
 function App() {
   return (
@@ -12,6 +15,7 @@ function App() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/list-item" element={<AddListing />} />
         <Route path="/swaps" element={<Swaps />} />
+        <Route path="/messages" element={<Messages />} />
       </Routes>
     </BrowserRouter>
   );
