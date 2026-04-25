@@ -10,10 +10,13 @@ import { useEffect, useState } from "react";
 
 
 
+
 function Home() {
 
     const [selectedCategory, setSelectedCategory] = useState("all");
     const [allProducts, setAllProducts] = useState([]);
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
   
 
@@ -37,6 +40,22 @@ function Home() {
                 (item) =>
                 item.category?.toLowerCase() === selectedCategory
             );
+    
+    useEffect(() => {
+  const fetchProducts = async () => {
+    try {
+      const res = await fetch("http://localhost:8000/api/products");
+      const data = await res.json();
+      setProducts(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProducts();
+}, []);
 
   return (
     <div>
@@ -127,12 +146,35 @@ function Home() {
       </section>
         
         
-        <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredProducts.map((item) => (
-  <ItemCard key={item._id} product={item} />
-))}
+        {loading ? (
+  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {[...Array(8)].map((_, i) => (
+      <div
+        key={i}
+        className="bg-white rounded-2xl shadow-sm overflow-hidden"
+      >
+        {/* IMAGE */}
+        <div className="w-full h-64 bg-gray-200"></div>
+
+        {/* CONTENT */}
+        <div className="p-4 space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
         </div>
-        <section className="bg-[hsl(40deg_25%_94%/50%)]">
+      </div>
+    ))}
+  </div>
+) : (
+  // ✅ REAL PRODUCTS
+  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {filteredProducts.map((item) => (
+      <ItemCard key={item._id} product={item} />
+    ))}
+  </div>
+)}
+        <section className="pb-12 bg-[hsl(40deg_25%_94%/50%)]">
             <section id="browse" className="mx-auto py-8 px-0">
                 <div className="container mx-10">
                     <h2 className="text-2xl font-bold text-left">Recommended for You</h2>
@@ -140,11 +182,35 @@ function Home() {
         
             </section>
 
-            <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                {recommendedProducts.map((item) => (
-                <ItemCard key={item._id} product={item} />
-                ))}
-            </div>
+            {loading ? (
+  // 🔄 SKELETON FOR RECOMMENDED
+  <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {[...Array(4)].map((_, i) => (
+      <div
+        key={i}
+        className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse"
+      >
+        {/* IMAGE */}
+        <div className="w-full h-64 bg-gray-200"></div>
+
+        {/* CONTENT */}
+        <div className="p-4 space-y-3">
+          <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+          <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+          <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+        </div>
+      </div>
+    ))}
+  </div>
+) : (
+  // ✅ REAL PRODUCTS
+  <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {recommendedProducts.map((item) => (
+      <ItemCard key={item._id} product={item} />
+    ))}
+  </div>
+)}
         </section>
 
         <Footer />
