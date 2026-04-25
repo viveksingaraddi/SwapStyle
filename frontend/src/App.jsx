@@ -4,6 +4,9 @@ import ProductPage from "./pages/ProductPage";
 import AddListing from "./pages/AddListing";
 import Swaps from "./pages/Swaps";
 import Messages from "./pages/Messages";
+import Profile from "./pages/Profile";
+import Admin from "./pages/Admin";
+
 
 
 
@@ -16,6 +19,8 @@ function App() {
         <Route path="/list-item" element={<AddListing />} />
         <Route path="/swaps" element={<Swaps />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/admin" element={<Admin />} />
       </Routes>
     </BrowserRouter>
   );
