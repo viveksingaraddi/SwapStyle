@@ -4,11 +4,45 @@ import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import axios from "axios";
 
 function ProductPage() {
   const { id } = useParams(); // ✅ get ID from URL
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const handleSwapRequest = async () => {
+  try {
+    const user = JSON.parse(localStorage.getItem("user"));
+    const token = localStorage.getItem("token");
+
+    if (!user || !token) {
+      alert("Please login first");
+      return;
+    }
+
+    await axios.post(
+      "http://localhost:8000/api/swaps",
+      {
+        requester: user._id,
+        owner: product.user, // ✅ FIXED
+        requestedProduct: product._id,
+        offeredProduct: product._id,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`, // ✅ IMPORTANT
+        },
+      }
+    );
+
+    alert("Swap request sent 🚀");
+
+  } catch (err) {
+    console.error("SWAP ERROR:", err.response?.data || err);
+    alert(err.response?.data?.error || "Error sending swap");
+  }
+};
 
   useEffect(() => {
     console.log("Fetching product ID:", id);
@@ -81,9 +115,12 @@ function ProductPage() {
               Condition: {product.condition}
             </p>
 
-            <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-500">
-              Request Swap
-            </button>
+            <button
+  onClick={handleSwapRequest}
+  className="bg-green-600 text-white px-6 py-3 rounded-lg"
+>
+  Request Swap
+</button>
 
           </div>
 

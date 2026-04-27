@@ -147,7 +147,7 @@ function Login() {
 
             <button className="w-full border border-gray-600 p-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-800">
               <img
-                src="https://www.svgrepo.com/show/475647/apple-color.svg"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Apple_logo_white.svg/1280px-Apple_logo_white.svg.png"
                 className="w-5 h-5"
               />
               Apple
