@@ -1,20 +1,33 @@
 import mongoose from "mongoose";
 
-const swapSchema = new mongoose.Schema({
-  offeredItem: {
-    name: String,
-    image: String,
-    price: Number,
+const swapSchema = new mongoose.Schema(
+  {
+    requester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    owner: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+
+    requestedProduct: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+
+    offeredProduct: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+    },
+
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
   },
-  requestedItem: {
-    name: String,
-    image: String,
-    price: Number,
-  },
-  status: {
-    type: String,
-    default: "pending",
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 export default mongoose.model("Swap", swapSchema);

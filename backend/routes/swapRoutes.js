@@ -1,27 +1,21 @@
 import express from "express";
-import Swap from "../models/Swap.js";
+import {
+  createSwap,
+  getUserSwaps,
+  updateSwapStatus,
+} from "../controllers/swapController.js";
+
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// CREATE SWAP
-router.post("/", async (req, res) => {
-  try {
-    const swap = new Swap(req.body);
-    await swap.save();
-    res.json(swap);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// ✅ CREATE swap
+router.post("/", authMiddleware, createSwap);
 
-// GET ALL SWAPS
-router.get("/", async (req, res) => {
-  try {
-    const swaps = await Swap.find().sort({ createdAt: -1 });
-    res.json(swaps);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// ✅ GET swaps (only current user)
+router.get("/", authMiddleware, getUserSwaps);
+
+// ✅ UPDATE swap status
+router.put("/:id", authMiddleware, updateSwapStatus);
 
 export default router;
