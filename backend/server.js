@@ -2,29 +2,32 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
+
 import productRoutes from "./routes/productRoutes.js";
 import swapRoutes from "./routes/swapRoutes.js";
 import authRoutes from "./routes/authRoutes.js";
-
-
+import userRoutes from "./routes/userRoutes.js";
 
 dotenv.config();
 
 const app = express();
 
-// ✅ Middleware
-app.use(cors());
-app.use(express.json());
-app.use("/api/auth", authRoutes);
+// ✅ FIX: increase payload size ONCE (not twice)
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
 
-// ✅ Root route
+app.use(cors());
+
+// ✅ Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/swaps", swapRoutes);
+app.use("/api/users", userRoutes);
+
+// ✅ Root
 app.get("/", (req, res) => {
   res.send("API WORKING 🚀");
 });
-
-// ✅ Routes
-app.use("/api/products", productRoutes);
-app.use("/api/swaps", swapRoutes);
 
 // ✅ DB
 mongoose.connect(process.env.MONGO_URI)

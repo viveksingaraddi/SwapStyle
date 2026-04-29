@@ -61,7 +61,37 @@ function Swaps() {
     return <p className="p-6">Please login first</p>;
   }
 
-  if (loading) return <p className="p-6">Loading swaps...</p>;
+  if (loading)
+  return (
+    <div>
+      <Navbar />
+
+      <div className="pt-24 px-6 max-w-5xl mx-auto">
+        <h1 className="text-2xl font-bold mb-6">Swap Requests</h1>
+
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className="border rounded-xl p-4 flex items-center justify-between animate-pulse"
+            >
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                <div className="w-24 h-4 bg-gray-200 rounded"></div>
+
+                <div className="w-6 h-4 bg-gray-200 rounded"></div>
+
+                <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                <div className="w-24 h-4 bg-gray-200 rounded"></div>
+              </div>
+
+              <div className="w-16 h-4 bg-gray-200 rounded"></div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <div>
