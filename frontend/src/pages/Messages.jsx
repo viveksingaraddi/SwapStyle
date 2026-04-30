@@ -1,47 +1,100 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { Send } from "lucide-react";
-
-const dummyChats = [
-  {
-    id: 1,
-    name: "Rahul",
-    lastMessage: "Is the jacket still available?",
-  },
-  {
-    id: 2,
-    name: "Sneha",
-    lastMessage: "I can swap my hoodie",
-  },
-];
-
-const dummyMessages = {
-  1: [
-    { fromMe: false, text: "Hey, is this available?" },
-    { fromMe: true, text: "Yes, it's available!" },
-  ],
-  2: [
-    { fromMe: false, text: "Interested in swapping?" },
-    { fromMe: true, text: "Yes sure!" },
-  ],
-};
+import axios from "axios";
+import { socket } from "../socket";
 
 function Messages() {
-  const [selectedChat, setSelectedChat] = useState(dummyChats[0]);
-  const [messages, setMessages] = useState(dummyMessages);
+  const [conversations, setConversations] = useState([]);
+  const [selectedChat, setSelectedChat] = useState(null);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const token = localStorage.getItem("token");
+  const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
 
-    const newMsg = { fromMe: true, text: input };
+  // ✅ 1. FETCH CONVERSATIONS
+  useEffect(() => {
+    const fetchConversations = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:8000/api/conversations",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setConversations(res.data);
+        if (res.data.length > 0) {
+          setSelectedChat(res.data[0]);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-    setMessages((prev) => ({
-      ...prev,
-      [selectedChat.id]: [...prev[selectedChat.id], newMsg],
-    }));
+    fetchConversations();
+  }, []);
 
-    setInput("");
+  // ✅ 2. FETCH MESSAGES + JOIN SOCKET ROOM
+  useEffect(() => {
+    if (!selectedChat) return;
+
+    socket.emit("joinConversation", selectedChat._id);
+
+    const fetchMessages = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:8000/api/messages/${selectedChat._id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setMessages(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchMessages();
+  }, [selectedChat]);
+
+  // ✅ 3. RECEIVE REAL-TIME MESSAGE
+  useEffect(() => {
+    socket.on("receiveMessage", (msg) => {
+      setMessages((prev) => [...prev, msg]);
+    });
+
+    return () => socket.off("receiveMessage");
+  }, []);
+
+  // ✅ 4. SEND MESSAGE
+  const handleSend = async () => {
+    if (!input.trim() || !selectedChat) return;
+
+    const messageData = {
+      conversationId: selectedChat._id,
+      text: input,
+    };
+
+    try {
+      const res = await axios.post(
+        "http://localhost:8000/api/messages",
+        messageData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // add locally
+      setMessages((prev) => [...prev, res.data]);
+
+      // send via socket
+      socket.emit("sendMessage", res.data);
+
+      setInput("");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -52,17 +105,20 @@ function Messages() {
 
         {/* LEFT SIDEBAR */}
         <div className="w-1/3 border-r overflow-y-auto hidden md:block">
-          {dummyChats.map((chat) => (
+          {conversations.map((chat) => (
             <div
-              key={chat.id}
+              key={chat._id}
               onClick={() => setSelectedChat(chat)}
               className={`p-4 cursor-pointer border-b hover:bg-gray-100 ${
-                selectedChat.id === chat.id ? "bg-gray-100" : ""
+                selectedChat?._id === chat._id ? "bg-gray-100" : ""
               }`}
             >
-              <h3 className="font-semibold">{chat.name}</h3>
+              <h3 className="font-semibold">
+                {chat.members?.find((m) => m._id !== chat.currentUser)?.name ||
+                  "User"}
+              </h3>
               <p className="text-sm text-gray-500 truncate">
-                {chat.lastMessage}
+                {chat.lastMessage || "Start chatting..."}
               </p>
             </div>
           ))}
@@ -73,23 +129,31 @@ function Messages() {
 
           {/* HEADER */}
           <div className="p-4 border-b font-semibold">
-            {selectedChat.name}
+            {selectedChat ? "Chat" : "Select a chat"}
           </div>
 
           {/* MESSAGES */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
-            {messages[selectedChat.id]?.map((msg, index) => (
-              <div
-                key={index}
-                className={`max-w-xs px-4 py-2 rounded-xl text-sm ${
-                  msg.fromMe
-                    ? "ml-auto bg-green-500 text-white"
-                    : "bg-gray-200 text-gray-800"
-                }`}
-              >
-                {msg.text}
-              </div>
-            ))}
+            {messages.map((msg, index) => {
+  const isMine = msg.sender === currentUserId;
+
+  return (
+    <div
+      key={index}
+      className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+    >
+      <div
+        className={`max-w-xs px-4 py-2 rounded-2xl text-sm shadow ${
+          isMine
+            ? "bg-green-500 text-white rounded-br-none"
+            : "bg-gray-200 text-gray-800 rounded-bl-none"
+        }`}
+      >
+        {msg.text}
+      </div>
+    </div>
+  );
+})}
           </div>
 
           {/* INPUT */}

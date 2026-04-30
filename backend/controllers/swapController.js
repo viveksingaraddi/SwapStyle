@@ -1,4 +1,6 @@
 import Swap from "../models/Swap.js";
+import Conversation from "../models/Conversation.js";
+
 
 // CREATE SWAP
 export const createSwap = async (req, res) => {
@@ -12,6 +14,12 @@ export const createSwap = async (req, res) => {
       offeredProduct,
       status: "pending",
     });
+
+    await Conversation.create({
+  members: [req.user.id, owner], // owner = other user
+  swap: swap._id,
+});
+
 
     res.status(201).json(swap);
   } catch (err) {
