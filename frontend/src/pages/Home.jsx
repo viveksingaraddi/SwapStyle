@@ -12,41 +12,36 @@ import { useEffect, useState } from "react";
 
 
 function Home() {
-
-    const [selectedCategory, setSelectedCategory] = useState("all");
-    const [allProducts, setAllProducts] = useState([]);
-    const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
-
-  
+  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [allProducts, setAllProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-  fetch("http://localhost:8000/api/products")
-    .then((res) => res.json())
-    .then((data) => {
-      console.log("PRODUCTS:", data); // 👈 ADD THIS
-      setAllProducts(data);
-    });
-}, []);
+    const cached = localStorage.getItem("products");
 
-    const recommendedProducts = allProducts.filter(
-        (item) => item?.recommended
-    );
+    // ✅ 1. LOAD FROM CACHE (FAST)
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      setAllProducts(parsed);
+      setLoading(false);
+      console.log("Loaded from cache ⚡");
+    }
 
-    const filteredProducts =
-        selectedCategory === "all"
-            ? allProducts
-            : allProducts.filter(
-                (item) =>
-                item.category?.toLowerCase() === selectedCategory
-            );
-    
-    useEffect(() => {
+    // ✅ 2. ALWAYS FETCH LATEST IN BACKGROUND (BEST PRACTICE)
+    fetchProducts();
+  }, []);
+
   const fetchProducts = async () => {
     try {
       const res = await fetch("http://localhost:8000/api/products");
       const data = await res.json();
-      setProducts(data);
+
+      setAllProducts(data);
+
+      // ✅ UPDATE CACHE
+      localStorage.setItem("products", JSON.stringify(data));
+
+      console.log("Fetched fresh data 🔄");
     } catch (err) {
       console.error(err);
     } finally {
@@ -54,8 +49,18 @@ function Home() {
     }
   };
 
-  fetchProducts();
-}, []);
+  // ✅ FILTERS
+  const recommendedProducts = allProducts.filter(
+    (item) => item?.recommended
+  );
+
+  const filteredProducts =
+    selectedCategory === "all"
+      ? allProducts
+      : allProducts.filter(
+          (item) =>
+            item.category?.toLowerCase() === selectedCategory
+        );
 
   return (
     <div>

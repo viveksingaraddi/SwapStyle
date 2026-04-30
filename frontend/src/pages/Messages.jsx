@@ -13,8 +13,10 @@ function Messages() {
   const token = localStorage.getItem("token");
   const currentUserId = JSON.parse(localStorage.getItem("user"))?._id;
 
-  // ✅ 1. FETCH CONVERSATIONS
+  // ✅ FETCH CONVERSATIONS
   useEffect(() => {
+    if (!token) return;
+
     const fetchConversations = async () => {
       try {
         const res = await axios.get(
@@ -23,21 +25,31 @@ function Messages() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+
         setConversations(res.data);
+
         if (res.data.length > 0) {
           setSelectedChat(res.data[0]);
         }
+
+        localStorage.setItem("chats", JSON.stringify(res.data));
+
       } catch (err) {
         console.error(err);
+
+        const cached = localStorage.getItem("chats");
+        if (cached) {
+          setConversations(JSON.parse(cached));
+        }
       }
     };
 
     fetchConversations();
-  }, []);
+  }, [token]);
 
-  // ✅ 2. FETCH MESSAGES + JOIN SOCKET ROOM
+  // ✅ FETCH MESSAGES
   useEffect(() => {
-    if (!selectedChat) return;
+    if (!selectedChat || !token) return;
 
     socket.emit("joinConversation", selectedChat._id);
 
@@ -49,49 +61,53 @@ function Messages() {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+
         setMessages(res.data);
+
       } catch (err) {
         console.error(err);
       }
     };
 
     fetchMessages();
-  }, [selectedChat]);
 
-  // ✅ 3. RECEIVE REAL-TIME MESSAGE
+  }, [selectedChat, token]);
+
+  // ✅ SOCKET LISTENER (SAFE CLEANUP)
   useEffect(() => {
-    socket.on("receiveMessage", (msg) => {
+    const handleReceive = (msg) => {
       setMessages((prev) => [...prev, msg]);
-    });
+    };
 
-    return () => socket.off("receiveMessage");
+    socket.on("receiveMessage", handleReceive);
+
+    return () => {
+      socket.off("receiveMessage", handleReceive);
+    };
   }, []);
 
-  // ✅ 4. SEND MESSAGE
+  // ✅ SEND MESSAGE
   const handleSend = async () => {
     if (!input.trim() || !selectedChat) return;
-
-    const messageData = {
-      conversationId: selectedChat._id,
-      text: input,
-    };
 
     try {
       const res = await axios.post(
         "http://localhost:8000/api/messages",
-        messageData,
+        {
+          conversationId: selectedChat._id,
+          text: input,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // add locally
       setMessages((prev) => [...prev, res.data]);
 
-      // send via socket
       socket.emit("sendMessage", res.data);
 
       setInput("");
+
     } catch (err) {
       console.error(err);
     }

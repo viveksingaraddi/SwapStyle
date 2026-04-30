@@ -7,34 +7,47 @@ function Swaps() {
   const [loading, setLoading] = useState(true);
 
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user")) || {};
+  
 
   useEffect(() => {
+    if (!token) return;
+
     const fetchSwaps = async () => {
       try {
+        setLoading(true);
+
         const res = await axios.get(
           "http://localhost:8000/api/swaps",
           {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
-        // ✅ filter invalid swaps (important)
         const validSwaps = res.data.filter(
           (s) => s.requestedProduct && s.offeredProduct
         );
 
         setSwaps(validSwaps);
+
+        // ✅ cache update
+        localStorage.setItem("swaps", JSON.stringify(validSwaps));
+
       } catch (err) {
-        console.error("Error fetching swaps:", err.response?.data || err);
+        console.error("Error fetching swaps:", err);
+
+        // ✅ fallback
+        const cached = localStorage.getItem("swaps");
+        if (cached) {
+          setSwaps(JSON.parse(cached));
+        }
+
       } finally {
         setLoading(false);
       }
     };
 
-    if (token) fetchSwaps();
+    fetchSwaps();
   }, [token]);
 
   const updateStatus = async (id, status) => {
@@ -43,23 +56,23 @@ function Swaps() {
         `http://localhost:8000/api/swaps/${id}`,
         { status },
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
 
       setSwaps((prev) =>
         prev.map((s) => (s._id === id ? { ...s, status } : s))
       );
+
+      // ✅ clear cache so next fetch is fresh
+      localStorage.removeItem("swaps");
+
     } catch (err) {
-      console.error("Update failed:", err.response?.data || err);
+      console.error("Update failed:", err);
     }
   };
 
-  if (!token) {
-    return <p className="p-6">Please login first</p>;
-  }
+  if (!token) return <p className="p-6">Please login first</p>;
 
   if (loading)
   return (
@@ -104,7 +117,7 @@ function Swaps() {
           <p>No swaps found</p>
         ) : (
           swaps.map((swap) => {
-            const isOwner = swap.owner?._id === user._id;
+            const isOwner = swap.owner?._id === user?._id;
 
             return (
               <div

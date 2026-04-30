@@ -12,9 +12,11 @@ function Profile() {
   const [mySwaps, setMySwaps] = useState([]);
 
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("listings"); // 🔥 NEW
+  const [activeTab, setActiveTab] = useState("listings");
 
-  // ✅ GET USER
+  const token = localStorage.getItem("token");
+
+  // ✅ LOAD USER
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("user"));
     setUser(storedUser);
@@ -22,20 +24,18 @@ function Profile() {
 
   // ✅ LOGOUT
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
     navigate("/login");
   };
 
   // ✅ FETCH DATA
   useEffect(() => {
-    if (!user) return;
+    if (!user || !token) return;
 
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        setLoading(true);
 
-        // 🔥 PARALLEL FETCH
         const [productsRes, swapsRes] = await Promise.all([
           axios.get("http://localhost:8000/api/products/my", {
             headers: { Authorization: `Bearer ${token}` },
@@ -47,15 +47,28 @@ function Profile() {
 
         setMyProducts(productsRes.data);
         setMySwaps(swapsRes.data);
+
+        // ✅ cache backup
+        localStorage.setItem("myProducts", JSON.stringify(productsRes.data));
+        localStorage.setItem("mySwaps", JSON.stringify(swapsRes.data));
+
       } catch (err) {
         console.error("Error fetching profile data", err);
+
+        // fallback
+        const cachedProducts = localStorage.getItem("myProducts");
+        const cachedSwaps = localStorage.getItem("mySwaps");
+
+        if (cachedProducts) setMyProducts(JSON.parse(cachedProducts));
+        if (cachedSwaps) setMySwaps(JSON.parse(cachedSwaps));
+
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [user]);
+  }, [user, token]);
 
   if (!user) {
     return (
