@@ -71,14 +71,35 @@ router.get("/my", authMiddleware, async (req, res) => {
 });
 
 
-// ✅ GET ALL PRODUCTS
+// ✅ GET ALL PRODUCTS (WITH FILTERING & PAGINATION)
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find()
-      .populate("user", "name email") // ✅ better info
-      .sort({ createdAt: -1 });
+    const { category, location, page = 1, limit = 8 } = req.query;
 
-    res.json(products);
+    const query = {};
+    if (category && category !== "all") {
+      query.category = { $regex: new RegExp(category, "i") };
+    }
+    if (location) {
+      query.location = { $regex: new RegExp(location, "i") };
+    }
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const products = await Product.find(query)
+      .populate("user", "name email")
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      products,
+      total,
+      page: parseInt(page),
+      pages: Math.ceil(total / parseInt(limit)),
+    });
   } catch (err) {
     console.error("FETCH PRODUCTS ERROR:", err);
     res.status(500).json({ error: "Server error" });

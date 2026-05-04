@@ -20,6 +20,40 @@ function Login() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const requestLocation = async (token) => {
+    if (!("geolocation" in navigator)) return;
+
+    const permission = confirm("SwapStyle would like to use your live location to show nearby swaps. Allow?");
+    if (!permission) return;
+
+    navigator.geolocation.getCurrentPosition(async (position) => {
+      const { latitude, longitude } = position.coords;
+      try {
+        // Simple reverse geocode (Free API)
+        const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
+        const geoData = await geoRes.json();
+        const city = geoData.city || geoData.locality || "Unknown";
+        const state = geoData.principalSubdivision || "";
+        const locationStr = `${city}, ${state}`;
+
+        // Save to backend
+        await axios.put("http://localhost:8000/api/users/profile", 
+          { location: locationStr },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+
+        // Update local user data
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        storedUser.location = locationStr;
+        localStorage.setItem("user", JSON.stringify(storedUser));
+        
+        console.log("Location saved:", locationStr);
+      } catch (err) {
+        console.error("Geo error:", err);
+      }
+    });
+  };
+
   const handleSubmit = async () => {
     try {
       const url = isLogin
@@ -31,6 +65,9 @@ function Login() {
       if (isLogin) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
+
+        // ✅ AUTO-LOCATION
+        await requestLocation(res.data.token);
 
         navigate("/");
       } else {

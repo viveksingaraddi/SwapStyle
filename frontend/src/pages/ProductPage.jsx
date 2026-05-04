@@ -61,7 +61,7 @@ function ProductPage() {
         {
           owner: product.user,
           requestedProduct: product._id,
-          offeredProduct: selectedProduct,
+          offeredProduct: selectedProduct._id,
         },
         {
           headers: {
@@ -173,9 +173,9 @@ function ProductPage() {
             {myProducts.map((item) => (
               <div
                 key={item._id}
-                onClick={() => setSelectedProduct(item._id)}
+                onClick={() => setSelectedProduct(item)}
                 className={`border rounded-lg p-2 cursor-pointer transition ${
-                  selectedProduct === item._id
+                  selectedProduct?._id === item._id
                     ? "border-green-500 bg-green-50"
                     : "hover:shadow-md"
                 }`}
@@ -189,9 +189,32 @@ function ProductPage() {
                 <p className="mt-2 text-sm font-medium">
                   {item.name}
                 </p>
+                <p className="text-xs text-gray-500">${item.price}</p>
               </div>
             ))}
           </div>
+
+          {/* ✅ VALUE COMPARISON */}
+          {selectedProduct && (
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                  <h3 className="text-sm font-bold mb-2">Value Comparison</h3>
+                  <div className="flex justify-between text-sm mb-1">
+                      <span>Their Item:</span>
+                      <span className="font-semibold">${product.price}</span>
+                  </div>
+                  <div className="flex justify-between text-sm mb-1">
+                      <span>Your Item:</span>
+                      <span className="font-semibold">${selectedProduct.price}</span>
+                  </div>
+                  <div className="border-t pt-2 mt-2 flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Difference:</span>
+                      <span className={`text-sm font-bold ${Math.abs(product.price - selectedProduct.price) <= 10 ? 'text-green-600' : 'text-orange-500'}`}>
+                          ${Math.abs(product.price - selectedProduct.price)} 
+                          ({Math.abs(product.price - selectedProduct.price) <= 10 ? 'Fair Match' : 'Negotiation likely'})
+                      </span>
+                  </div>
+              </div>
+          )}
 
           {/* ✅ ACTION BUTTON */}
           <button

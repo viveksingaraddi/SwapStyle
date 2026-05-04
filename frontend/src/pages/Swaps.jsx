@@ -122,47 +122,49 @@ function Swaps() {
             return (
               <div
                 key={swap._id}
-                className="border rounded-xl p-4 mb-4 flex items-center justify-between"
+                className="border rounded-xl p-4 mb-4 flex flex-col md:flex-row items-center justify-between gap-4"
               >
-                {/* LEFT - Offered */}
-                <div className="flex items-center gap-3">
-                  <img
-                    src={swap.offeredProduct?.images?.[0]}
-                    alt=""
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <p className="font-medium">
-                    {swap.offeredProduct?.name}
-                  </p>
-                </div>
+                <div className="flex items-center gap-4 w-full md:w-auto">
+                    {/* LEFT - Offered */}
+                    <div className="flex items-center gap-3">
+                    <img
+                        src={swap.offeredProduct?.images?.[0]}
+                        alt=""
+                        className="w-20 h-20 object-cover rounded"
+                    />
+                    <p className="font-medium text-sm md:text-base">
+                        {swap.offeredProduct?.name}
+                    </p>
+                    </div>
 
-                {/* MIDDLE */}
-                <div className="text-xl">⇄</div>
+                    {/* MIDDLE */}
+                    <div className="text-xl">⇄</div>
 
-                {/* RIGHT - Requested */}
-                <div className="flex items-center gap-3">
-                  <img
-                    src={swap.requestedProduct?.images?.[0]}
-                    alt=""
-                    className="w-20 h-20 object-cover rounded"
-                  />
-                  <p className="font-medium">
-                    {swap.requestedProduct?.name}
-                  </p>
+                    {/* RIGHT - Requested */}
+                    <div className="flex items-center gap-3">
+                    <img
+                        src={swap.requestedProduct?.images?.[0]}
+                        alt=""
+                        className="w-20 h-20 object-cover rounded"
+                    />
+                    <p className="font-medium text-sm md:text-base">
+                        {swap.requestedProduct?.name}
+                    </p>
+                    </div>
                 </div>
 
                 {/* STATUS + ACTION */}
-                <div className="text-right">
-                  <p className="capitalize mb-2">{swap.status}</p>
+                <div className="text-center md:text-right w-full md:w-auto pt-4 md:pt-0 border-t md:border-none">
+                  <p className="capitalize mb-2 font-bold text-sm">{swap.status}</p>
 
                   {/* ✅ ONLY OWNER CAN ACCEPT */}
                   {isOwner && swap.status === "pending" && (
-                    <>
+                    <div className="flex justify-center md:justify-end gap-2">
                       <button
                         onClick={() =>
                           updateStatus(swap._id, "accepted")
                         }
-                        className="bg-green-500 text-white px-3 py-1 rounded mr-2"
+                        className="bg-green-500 text-white px-4 py-2 rounded text-sm font-semibold"
                       >
                         Accept
                       </button>
@@ -170,11 +172,11 @@ function Swaps() {
                         onClick={() =>
                           updateStatus(swap._id, "rejected")
                         }
-                        className="bg-red-500 text-white px-3 py-1 rounded"
+                        className="bg-red-500 text-white px-4 py-2 rounded text-sm font-semibold"
                       >
                         Reject
                       </button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>

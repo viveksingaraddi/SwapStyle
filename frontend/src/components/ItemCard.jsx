@@ -16,6 +16,7 @@ function ItemCard({ product }) {
         <img
           src={product.images?.[0] || "https://via.placeholder.com/300"}
           alt={product.name}
+          loading="lazy"
           className="w-full h-80 object-cover hover:scale-105 transition"
         />
 

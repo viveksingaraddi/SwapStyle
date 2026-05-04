@@ -260,6 +260,10 @@ function AddListing() {
                 <option>Tops</option>
                 <option>Jeans</option>
                 <option>Shoes</option>
+                <option>Suits</option>
+                <option>Gowns</option>
+                <option>Formal Wear</option>
+                <option>Accessories</option>
               </select>
             </div>
 
@@ -308,20 +312,45 @@ function AddListing() {
 
           {/* PRICE + LOCATION */}
           <div className="grid grid-cols-2 gap-4 mb-6">
-            <input
-              name="price"
-              placeholder="Swap Value ($)"
-              value={formData.price}
-              onChange={handleChange}
-              className={inputClass}
-            />
-            <input
-              name="location"
-              placeholder="City, State"
-              value={formData.location}
-              onChange={handleChange}
-              className={inputClass}
-            />
+            <div className="relative">
+              <label className="text-sm font-medium">Swap Value ($) *</label>
+              <input
+                name="price"
+                placeholder="e.g. 50"
+                value={formData.price}
+                onChange={handleChange}
+                className={inputClass}
+              />
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!formData.category || !formData.condition) {
+                    alert("Please select category and condition first");
+                    return;
+                  }
+                  try {
+                    const res = await fetch(`http://localhost:8000/api/value/calculate?category=${formData.category}&brand=${formData.brand}&condition=${formData.condition}`);
+                    const data = await res.json();
+                    setFormData(prev => ({ ...prev, price: data.estimatedValue.toString() }));
+                  } catch (err) {
+                    console.error(err);
+                  }
+                }}
+                className="absolute right-2 top-[34px] text-xs bg-green-100 text-green-700 px-2 py-1 rounded hover:bg-green-200 transition"
+              >
+                Auto-Calc
+              </button>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Location *</label>
+              <input
+                name="location"
+                placeholder="City, State"
+                value={formData.location}
+                onChange={handleChange}
+                className={inputClass}
+              />
+            </div>
           </div>
 
           {/* BUTTON */}

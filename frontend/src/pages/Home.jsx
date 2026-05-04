@@ -12,56 +12,51 @@ import { useEffect, useState } from "react";
 
 
 function Home() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [allProducts, setAllProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+    const [selectedCategory, setSelectedCategory] = useState("all");
+    const [locationSearch, setLocationSearch] = useState("");
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalProducts, setTotalProducts] = useState(0);
 
-  useEffect(() => {
-    const cached = localStorage.getItem("products");
+    const user = JSON.parse(localStorage.getItem("user"));
 
-    // ✅ 1. LOAD FROM CACHE (FAST)
-    if (cached) {
-      const parsed = JSON.parse(cached);
-      setAllProducts(parsed);
-      setLoading(false);
-      console.log("Loaded from cache ⚡");
-    }
+    const fetchProducts = async (pageToFetch = 1, append = false) => {
+        setLoading(true);
+        try {
+            const url = `http://localhost:8000/api/products?page=${pageToFetch}&limit=8&category=${selectedCategory}&location=${locationSearch}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            if (append) {
+                setProducts(prev => [...prev, ...data.products]);
+            } else {
+                setProducts(data.products);
+            }
+            setTotalPages(data.pages);
+            setTotalProducts(data.total);
+            setPage(data.page);
+        } catch (err) {
+            console.error("Fetch Error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    // ✅ 2. ALWAYS FETCH LATEST IN BACKGROUND (BEST PRACTICE)
-    fetchProducts();
-  }, []);
+    useEffect(() => {
+        fetchProducts(1, false);
+    }, [selectedCategory, locationSearch]);
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch("http://localhost:8000/api/products");
-      const data = await res.json();
+    const handleLoadMore = () => {
+        if (page < totalPages) {
+            fetchProducts(page + 1, true);
+        }
+    };
 
-      setAllProducts(data);
-
-      // ✅ UPDATE CACHE
-      localStorage.setItem("products", JSON.stringify(data));
-
-      console.log("Fetched fresh data 🔄");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // ✅ FILTERS
-  const recommendedProducts = allProducts.filter(
-    (item) => item?.recommended
-  );
-
-  const filteredProducts =
-    selectedCategory === "all"
-      ? allProducts
-      : allProducts.filter(
-          (item) =>
-            item.category?.toLowerCase() === selectedCategory
-        );
-
+    const recommendedProducts = products.filter(
+        (item) => item?.recommended
+    );
   return (
     <div>
       <Navbar />
@@ -93,11 +88,21 @@ function Home() {
       {/* Buttons */}
       <div className="flex flex-wrap gap-3 mt-4">
 
-        <button className="px-5 py-2 md:px-6 md:py-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition">
+        <button 
+          onClick={() => {
+              const el = document.getElementById("browse");
+              el?.scrollIntoView({ behavior: "smooth" });
+          }}
+          className="px-5 py-2 md:px-6 md:py-3 bg-green-600 text-white rounded-full hover:bg-green-500 transition">
           Start Swapping
         </button>
 
-        <button className="px-5 py-2 md:px-6 md:py-3 bg-white/50 text-white rounded-full hover:bg-green-500 transition">
+        <button 
+          onClick={() => {
+            const el = document.getElementById("browse");
+            el?.scrollIntoView({ behavior: "smooth" });
+        }}
+          className="px-5 py-2 md:px-6 md:py-3 bg-white/50 text-white rounded-full hover:bg-green-500 transition">
           Browse Items
         </button>
 
@@ -127,15 +132,37 @@ function Home() {
       </section>
 
       <section id="browse" className="mx-auto py-8 px-0">
-        <div className="container mx-10">
+        <div className="container mx-auto px-4 md:px-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h2 className="text-2xl font-bold text-left">Browse Listings</h2>
+            
+            <div className="flex items-center gap-2 bg-gray-100 rounded-full px-4 py-2 border border-gray-200">
+                <span className="text-gray-400">📍</span>
+                <input 
+                    type="text" 
+                    placeholder="Search by location..." 
+                    className="bg-transparent border-none outline-none text-sm w-40"
+                    value={locationSearch}
+                    onChange={(e) => setLocationSearch(e.target.value)}
+                />
+                {user?.location && !locationSearch && (
+                    <button 
+                        onClick={() => setLocationSearch(user.location)}
+                        className="text-xs text-green-600 font-medium hover:underline"
+                    >
+                        Near Me
+                    </button>
+                )}
+            </div>
         </div>
         <div className="container px-6 py-6">
             <div className="flex gap-2 overflow-x-auto whitespace-nowrap scrollbar-hide">
-  {["all", "jackets", "sweaters", "dresses", "shoes", "tops", "skirts", "jeans"].map((cat) => (
+  {["all", "jackets", "sweaters", "dresses", "shoes", "tops", "skirts", "jeans", "suits", "gowns", "formal wear", "accessories"].map((cat) => (
     <button
       key={cat}
-      onClick={() => setSelectedCategory(cat)}
+      onClick={() => {
+          setSelectedCategory(cat);
+          setPage(1);
+      }}
       className={`px-4 py-2 rounded-full border border-gray-300/50 transition
         ${
           selectedCategory === cat
@@ -151,12 +178,12 @@ function Home() {
       </section>
         
         
-        {loading ? (
+        {loading && page === 1 ? (
   <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     {[...Array(8)].map((_, i) => (
       <div
         key={i}
-        className="bg-white rounded-2xl shadow-sm overflow-hidden"
+        className="bg-white rounded-2xl shadow-sm overflow-hidden animate-pulse"
       >
         {/* IMAGE */}
         <div className="w-full h-64 bg-gray-200"></div>
@@ -172,22 +199,43 @@ function Home() {
     ))}
   </div>
 ) : (
-  // ✅ REAL PRODUCTS
-  <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {filteredProducts.map((item) => (
-      <ItemCard key={item._id} product={item} />
-    ))}
-  </div>
+  <>
+    {/* ✅ REAL PRODUCTS */}
+    <div className="p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {products.length > 0 ? (
+            products.map((item) => (
+                <ItemCard key={item._id} product={item} />
+            ))
+        ) : (
+            <div className="col-span-full py-20 text-center text-gray-500">
+                No items found in this category or location.
+            </div>
+        )}
+    </div>
+
+    {/* ✅ LOAD MORE */}
+    {page < totalPages && (
+        <div className="flex justify-center pb-12">
+            <button 
+                onClick={handleLoadMore}
+                disabled={loading}
+                className="px-8 py-3 bg-white border border-green-600 text-green-600 rounded-full font-semibold hover:bg-green-50 transition"
+            >
+                {loading ? "Loading..." : "Load More"}
+            </button>
+        </div>
+    )}
+  </>
 )}
         <section className="pb-12 bg-[hsl(40deg_25%_94%/50%)]">
             <section id="browse" className="mx-auto py-8 px-0">
-                <div className="container mx-10">
+                <div className="container mx-auto px-4 md:px-10">
                     <h2 className="text-2xl font-bold text-left">Recommended for You</h2>
                 </div>
         
             </section>
 
-            {loading ? (
+            {loading && page === 1 ? (
   // 🔄 SKELETON FOR RECOMMENDED
   <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
     {[...Array(4)].map((_, i) => (
@@ -211,7 +259,7 @@ function Home() {
 ) : (
   // ✅ REAL PRODUCTS
   <div className="grid grid-cols-1 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    {recommendedProducts.map((item) => (
+    {products.slice(0, 4).map((item) => (
       <ItemCard key={item._id} product={item} />
     ))}
   </div>

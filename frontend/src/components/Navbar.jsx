@@ -96,12 +96,23 @@ function Navbar() {
           </div>
 
           {/* MENU ITEMS */}
-          {["Browse", "List Item", "Swaps", "Messages", "Profile", "Admin"].map((item) => (
-            <a key={item} href="#" className="block text-sm font-medium border-b pb-2">
-              {item}
-            </a>
+          {[
+            { name: "Browse", path: "/" },
+            { name: "List Item", path: "/list-item" },
+            { name: "Swaps", path: "/swaps" },
+            { name: "Messages", path: "/messages" },
+            { name: "Profile", path: "/profile" },
+            { name: "Admin", path: "/admin" },
+          ].map((item) => (
+            <Link
+              key={item.name}
+              to={item.path}
+              onClick={() => setIsOpen(false)}
+              className="block text-sm font-medium border-b pb-2 hover:text-green-600 transition"
+            >
+              {item.name}
+            </Link>
           ))}
-
         </div>
       )}
 
