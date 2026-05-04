@@ -32,9 +32,16 @@ function Login() {
         // Simple reverse geocode (Free API)
         const geoRes = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}&localityLanguage=en`);
         const geoData = await geoRes.json();
-        const city = geoData.city || geoData.locality || "Unknown";
-        const state = geoData.principalSubdivision || "";
-        const locationStr = `${city}, ${state}`;
+        
+        // Exact location construction
+        const parts = [
+            geoData.locality,
+            geoData.city,
+            geoData.principalSubdivision,
+            geoData.countryName
+        ].filter(Boolean);
+
+        const locationStr = parts.join(", ");
 
         // Save to backend
         await axios.put("http://localhost:8000/api/users/profile", 

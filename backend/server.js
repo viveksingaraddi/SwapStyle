@@ -13,6 +13,7 @@ import messageRoutes from "./routes/messageRoutes.js";
 import conversationRoutes from "./routes/conversationRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import valueRoutes from "./routes/valueRoutes.js";
+import notificationRoutes from "./routes/notificationRoutes.js";
 
 
 dotenv.config();
@@ -45,6 +46,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/conversations", conversationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/value", valueRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 // ✅ ROOT
@@ -64,6 +66,11 @@ io.on("connection", (socket) => {
   // send message to that room
   socket.on("sendMessage", (data) => {
     socket.to(data.conversationId).emit("receiveMessage", data);
+  });
+
+  // notify sender that message was read
+  socket.on("messageRead", (data) => {
+    socket.to(data.conversationId).emit("userReadMessages", data);
   });
 
   socket.on("disconnect", () => {

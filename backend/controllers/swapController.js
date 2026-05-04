@@ -1,5 +1,6 @@
 import Swap from "../models/Swap.js";
 import Conversation from "../models/Conversation.js";
+import { createNotification } from "../routes/notificationRoutes.js";
 
 
 // CREATE SWAP
@@ -15,11 +16,29 @@ export const createSwap = async (req, res) => {
       status: "pending",
     });
 
-    await Conversation.create({
-  members: [req.user.id, owner], // owner = other user
-  swap: swap._id,
-});
+    // ✅ CHECK FOR EXISTING CONVERSATION (WhatsApp Style)
+    let conversation = await Conversation.findOne({
+      members: { $all: [req.user.id, owner] }
+    });
 
+    if (!conversation) {
+      await Conversation.create({
+        members: [req.user.id, owner],
+        swap: swap._id,
+      });
+    } else {
+      conversation.swap = swap._id;
+      await conversation.save();
+    }
+
+    // ✅ NOTIFY OWNER
+    await createNotification({
+      recipient: owner,
+      sender: req.user.id,
+      type: "swap_request",
+      message: "received a new swap request! 🎁",
+      link: "/swaps",
+    });
 
     res.status(201).json(swap);
   } catch (err) {
@@ -64,6 +83,15 @@ export const updateSwapStatus = async (req, res) => {
 
     swap.status = req.body.status;
     await swap.save();
+
+    // ✅ NOTIFY REQUESTER
+    await createNotification({
+      recipient: swap.requester,
+      sender: req.user.id,
+      type: swap.status === "accepted" ? "swap_accepted" : "swap_rejected",
+      message: `your swap request has been ${swap.status}! ${swap.status === "accepted" ? "🎉" : "😔"}`,
+      link: "/swaps",
+    });
 
     res.json(swap);
   } catch (err) {

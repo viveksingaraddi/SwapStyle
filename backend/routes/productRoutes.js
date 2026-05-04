@@ -74,7 +74,7 @@ router.get("/my", authMiddleware, async (req, res) => {
 // ✅ GET ALL PRODUCTS (WITH FILTERING & PAGINATION)
 router.get("/", async (req, res) => {
   try {
-    const { category, location, page = 1, limit = 8 } = req.query;
+    const { category, location, search, page = 1, limit = 8 } = req.query;
 
     const query = {};
     if (category && category !== "all") {
@@ -82,6 +82,9 @@ router.get("/", async (req, res) => {
     }
     if (location) {
       query.location = { $regex: new RegExp(location, "i") };
+    }
+    if (search) {
+      query.name = { $regex: new RegExp(search, "i") };
     }
 
     const skip = (parseInt(page) - 1) * parseInt(limit);
